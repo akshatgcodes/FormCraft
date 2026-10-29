@@ -1,0 +1,59 @@
+{
+  "_comment": "Shared by backend/tests/test_shared_cases.py and frontend/src/logic.test.ts. Both implementations must agree on every case.",
+  "rules": [
+    {"name": "equals match", "cond": {"field": "a", "op": "equals", "value": "Yes"}, "answers": {"a": "Yes"}, "expected": true},
+    {"name": "equals is case-sensitive", "cond": {"field": "a", "op": "equals", "value": "Yes"}, "answers": {"a": "yes"}, "expected": false},
+    {"name": "equals on missing answer", "cond": {"field": "a", "op": "equals", "value": "Yes"}, "answers": {}, "expected": false},
+    {"name": "not_equals on missing answer", "cond": {"field": "a", "op": "not_equals", "value": "Yes"}, "answers": {}, "expected": true},
+    {"name": "not_equals different", "cond": {"field": "a", "op": "not_equals", "value": "Yes"}, "answers": {"a": "No"}, "expected": true},
+    {"name": "equals number", "cond": {"field": "n", "op": "equals", "value": 5}, "answers": {"n": 5}, "expected": true},
+    {"name": "contains in list", "cond": {"field": "c", "op": "contains", "value": "Python"}, "answers": {"c": ["Go", "Python"]}, "expected": true},
+    {"name": "contains not in list", "cond": {"field": "c", "op": "contains", "value": "Rust"}, "answers": {"c": ["Go"]}, "expected": false},
+    {"name": "contains substring ignores case", "cond": {"field": "t", "op": "contains", "value": "react"}, "answers": {"t": "I love React hooks"}, "expected": true},
+    {"name": "not_contains on missing", "cond": {"field": "c", "op": "not_contains", "value": "Go"}, "answers": {}, "expected": true},
+    {"name": "empty on blank string", "cond": {"field": "t", "op": "empty"}, "answers": {"t": ""}, "expected": true},
+    {"name": "empty on empty list", "cond": {"field": "c", "op": "empty"}, "answers": {"c": []}, "expected": true},
+    {"name": "not_empty with value", "cond": {"field": "t", "op": "not_empty"}, "answers": {"t": "x"}, "expected": true},
+    {"name": "gt number", "cond": {"field": "n", "op": "gt", "value": 18}, "answers": {"n": 21}, "expected": true},
+    {"name": "gt equal is false", "cond": {"field": "n", "op": "gt", "value": 18}, "answers": {"n": 18}, "expected": false},
+    {"name": "lt on missing is false", "cond": {"field": "n", "op": "lt", "value": 18}, "answers": {}, "expected": false},
+    {"name": "gt date", "cond": {"field": "d", "op": "gt", "value": "2024-06-01"}, "answers": {"d": "2024-07-15"}, "expected": true},
+    {"name": "lt date", "cond": {"field": "d", "op": "lt", "value": "2024-06-01"}, "answers": {"d": "2024-07-15"}, "expected": false},
+    {"name": "all group", "cond": {"all": [{"field": "a", "op": "equals", "value": "Yes"}, {"field": "n", "op": "gt", "value": 2}]}, "answers": {"a": "Yes", "n": 3}, "expected": true},
+    {"name": "all group one false", "cond": {"all": [{"field": "a", "op": "equals", "value": "Yes"}, {"field": "n", "op": "gt", "value": 2}]}, "answers": {"a": "Yes", "n": 1}, "expected": false},
+    {"name": "any group", "cond": {"any": [{"field": "a", "op": "equals", "value": "Yes"}, {"field": "n", "op": "gt", "value": 2}]}, "answers": {"a": "No", "n": 3}, "expected": true},
+    {"name": "nested group", "cond": {"all": [{"field": "a", "op": "equals", "value": "Yes"}, {"any": [{"field": "c", "op": "contains", "value": "Go"}, {"field": "n", "op": "lt", "value": 0}]}]}, "answers": {"a": "Yes", "c": ["Go"]}, "expected": true}
+  ],
+  "visibility": [
+    {
+      "name": "student branch",
+      "fields": [
+        {"id": "is_student", "type": "dropdown", "options": ["Yes", "No"]},
+        {"id": "college", "type": "text", "show_if": {"field": "is_student", "op": "equals", "value": "Yes"}},
+        {"id": "company", "type": "text", "show_if": {"field": "is_student", "op": "equals", "value": "No"}}
+      ],
+      "answers": {"is_student": "Yes", "company": "Stale answer"},
+      "expected": ["is_student", "college"]
+    },
+    {
+      "name": "hidden field's answer doesn't leak into later conditions",
+      "fields": [
+        {"id": "is_student", "type": "dropdown", "options": ["Yes", "No"]},
+        {"id": "year", "type": "dropdown", "options": ["1", "2", "3", "4"], "show_if": {"field": "is_student", "op": "equals", "value": "Yes"}},
+        {"id": "internship", "type": "text", "show_if": {"field": "year", "op": "equals", "value": "3"}}
+      ],
+      "answers": {"is_student": "No", "year": "3"},
+      "expected": ["is_student"]
+    },
+    {
+      "name": "chain shows all levels",
+      "fields": [
+        {"id": "is_student", "type": "dropdown", "options": ["Yes", "No"]},
+        {"id": "year", "type": "dropdown", "options": ["1", "2", "3", "4"], "show_if": {"field": "is_student", "op": "equals", "value": "Yes"}},
+        {"id": "internship", "type": "text", "show_if": {"field": "year", "op": "equals", "value": "3"}}
+      ],
+      "answers": {"is_student": "Yes", "year": "3"},
+      "expected": ["is_student", "year", "internship"]
+    }
+  ]
+}

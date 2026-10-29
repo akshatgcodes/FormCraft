@@ -17,7 +17,9 @@ STUDENT = {"id": "is_student", "type": "dropdown", "label": "Student?", "options
 
 def test_valid_schema_has_no_errors():
     college = {
-        "id": "college", "type": "text", "label": "College",
+        "id": "college",
+        "type": "text",
+        "label": "College",
         "show_if": {"field": "is_student", "op": "equals", "value": "Yes"},
     }
     assert errors_for(STUDENT, college) == []
@@ -25,7 +27,9 @@ def test_valid_schema_has_no_errors():
 
 def test_condition_cannot_point_forward():
     early = {
-        "id": "college", "type": "text", "label": "College",
+        "id": "college",
+        "type": "text",
+        "label": "College",
         "show_if": {"field": "is_student", "op": "equals", "value": "Yes"},
     }
     assert "isn't a field above" in errors_for(early, STUDENT)[0]
@@ -37,18 +41,33 @@ def test_self_reference_rejected():
 
 
 def test_op_must_fit_field_type():
-    f = {"id": "x", "type": "text", "label": "X", "show_if": {"field": "is_student", "op": "gt", "value": "Yes"}}
+    f = {
+        "id": "x",
+        "type": "text",
+        "label": "X",
+        "show_if": {"field": "is_student", "op": "gt", "value": "Yes"},
+    }
     assert "can't be used on a dropdown" in errors_for(STUDENT, f)[0]
 
 
 def test_condition_value_must_be_an_option():
-    f = {"id": "x", "type": "text", "label": "X", "show_if": {"field": "is_student", "op": "equals", "value": "Maybe"}}
+    f = {
+        "id": "x",
+        "type": "text",
+        "label": "X",
+        "show_if": {"field": "is_student", "op": "equals", "value": "Maybe"},
+    }
     assert "isn't an option" in errors_for(STUDENT, f)[0]
 
 
 def test_number_condition_needs_number():
     age = {"id": "age", "type": "number", "label": "Age"}
-    f = {"id": "x", "type": "text", "label": "X", "show_if": {"field": "age", "op": "gt", "value": "18"}}
+    f = {
+        "id": "x",
+        "type": "text",
+        "label": "X",
+        "show_if": {"field": "age", "op": "gt", "value": "18"},
+    }
     assert "needs a number" in errors_for(age, f)[0]
 
 
@@ -83,13 +102,23 @@ def test_structural_errors_from_pydantic():
 # --------------------------------------------------------------------------- submissions
 
 FIELDS = [
-    {"id": "name", "type": "text", "label": "Name", "required": True,
-     "validation": {"min_length": 2}},
+    {
+        "id": "name",
+        "type": "text",
+        "label": "Name",
+        "required": True,
+        "validation": {"min_length": 2},
+    },
     {"id": "email", "type": "email", "label": "Email"},
     {"id": "age", "type": "number", "label": "Age", "validation": {"min": 13, "max": 120}},
     STUDENT,
-    {"id": "college", "type": "text", "label": "College", "required": True,
-     "show_if": {"field": "is_student", "op": "equals", "value": "Yes"}},
+    {
+        "id": "college",
+        "type": "text",
+        "label": "College",
+        "required": True,
+        "show_if": {"field": "is_student", "op": "equals", "value": "Yes"},
+    },
     {"id": "langs", "type": "checkbox", "label": "Languages", "options": ["Go", "Python", "Rust"]},
     {"id": "start", "type": "date", "label": "Start", "validation": {"min": "2024-01-01"}},
     {"id": "roll", "type": "text", "label": "Roll no.", "validation": {"pattern": r"RA\d{4}"}},
@@ -97,10 +126,18 @@ FIELDS = [
 
 
 def test_clean_submission():
-    clean, errors = validate_submission(FIELDS, {
-        "name": "  Akshat ", "age": 21, "is_student": "Yes", "college": "SRMIST",
-        "langs": ["Rust", "Go", "Go"], "start": "2024-06-01", "roll": "RA1234",
-    })
+    clean, errors = validate_submission(
+        FIELDS,
+        {
+            "name": "  Akshat ",
+            "age": 21,
+            "is_student": "Yes",
+            "college": "SRMIST",
+            "langs": ["Rust", "Go", "Go"],
+            "start": "2024-06-01",
+            "roll": "RA1234",
+        },
+    )
     assert errors == {}
     assert clean["name"] == "Akshat"
     assert clean["langs"] == ["Go", "Rust"]  # option order, deduped
@@ -118,19 +155,22 @@ def test_hidden_required_field_is_skipped_and_dropped():
     assert errors == {} and "college" not in clean
 
 
-@pytest.mark.parametrize("answers,field,msg", [
-    ({"name": "A"}, "name", "at least 2 characters"),
-    ({"name": "   "}, "name", "is required"),
-    ({"name": "Ak", "email": "nope"}, "email", "valid email"),
-    ({"name": "Ak", "age": 5}, "age", "at least 13"),
-    ({"name": "Ak", "age": "21"}, "age", "must be a number"),
-    ({"name": "Ak", "age": True}, "age", "must be a number"),
-    ({"name": "Ak", "is_student": "Maybe"}, "is_student", "pick one"),
-    ({"name": "Ak", "langs": ["Java"]}, "langs", "pick from"),
-    ({"name": "Ak", "start": "2023-12-31"}, "start", "on or after"),
-    ({"name": "Ak", "start": "31/12/2024"}, "start", "YYYY-MM-DD"),
-    ({"name": "Ak", "roll": "RA12"}, "roll", "required format"),
-])
+@pytest.mark.parametrize(
+    "answers,field,msg",
+    [
+        ({"name": "A"}, "name", "at least 2 characters"),
+        ({"name": "   "}, "name", "is required"),
+        ({"name": "Ak", "email": "nope"}, "email", "valid email"),
+        ({"name": "Ak", "age": 5}, "age", "at least 13"),
+        ({"name": "Ak", "age": "21"}, "age", "must be a number"),
+        ({"name": "Ak", "age": True}, "age", "must be a number"),
+        ({"name": "Ak", "is_student": "Maybe"}, "is_student", "pick one"),
+        ({"name": "Ak", "langs": ["Java"]}, "langs", "pick from"),
+        ({"name": "Ak", "start": "2023-12-31"}, "start", "on or after"),
+        ({"name": "Ak", "start": "31/12/2024"}, "start", "YYYY-MM-DD"),
+        ({"name": "Ak", "roll": "RA12"}, "roll", "required format"),
+    ],
+)
 def test_invalid_values(answers, field, msg):
     _, errors = validate_submission(FIELDS, answers)
     assert msg in errors[field]

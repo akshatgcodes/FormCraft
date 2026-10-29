@@ -20,9 +20,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 FieldType = Literal["text", "textarea", "email", "number", "dropdown", "checkbox", "date"]
-Op = Literal[
-    "equals", "not_equals", "contains", "not_contains", "empty", "not_empty", "gt", "lt"
-]
+Op = Literal["equals", "not_equals", "contains", "not_contains", "empty", "not_empty", "gt", "lt"]
 
 CHOICE_TYPES = {"dropdown", "checkbox"}
 TEXT_TYPES = {"text", "textarea", "email"}

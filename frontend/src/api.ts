@@ -54,4 +54,4 @@ export const api = {
     request<{ id: number }>(`/api/public/forms/${slug}/responses`, send("POST", answers)),
 };
 
-export const shareUrl = (slug: string) => `${window.location.origin}/f/${slug}`;
+export const shareUrl = (slug: string) => `${window.location.origin}${import.meta.env.BASE_URL}f/${slug}`;

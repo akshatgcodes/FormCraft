@@ -16,6 +16,9 @@
 </p>
 
 <p align="center">
+  <a href="https://formcraft.akshatgcodes.in">
+    <img src="https://img.shields.io/badge/live_demo-5b4bdb-5b4bdb?style=flat-square" alt="Live Demo">
+  </a>
   <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React">
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
   <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI">
@@ -30,6 +33,9 @@
 Drag fields onto a form, set labels and validation, publish, and share a link. Responses land in a table you can search and export to CSV.
 
 The feature that separates it from a toy builder is **conditional logic**. *"Are you a student?" → Yes → show "College name" and "Year of study".* Pick 3rd or 4th year and an internship question appears. Conditions can be nested `all`/`any` trees, and the server re-runs them on every submission, so hidden answers are never stored and required fields are only enforced where they're visible.
+
+> **Live demo →** [formcraft.akshatgcodes.in](https://formcraft.akshatgcodes.in)
+> Log in with the demo password `demo1234`, then click **Start from example**.
 
 ---
 

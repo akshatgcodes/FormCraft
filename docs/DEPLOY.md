@@ -1,25 +1,29 @@
 # Deploy
 
-FormCraft is **not deployed yet**. This is the intended setup.
+Live at **https://formcraft.akshatgcodes.in**: one Vercel project, connected to this repo, so every push to `main` deploys (Dependabot branches are skipped by `ignoreCommand`).
 
-| Part | Platform |
+| Path | Served by |
 |---|---|
-| Frontend | Vercel (`frontend/`, build `npm run build`, output `dist`, SPA rewrite to `index.html`) |
-| API | Render web service (`backend/`, start `uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT`) |
-| Database | Neon PostgreSQL (JSONB columns) |
+| `/` | the landing page (`landing/`, a Next.js static export) |
+| `/app/` | the React app (`frontend/`, built with `VITE_BASE=/app/`) |
+| `/api/…`, `/health` | FastAPI as a Python function (`index.py` imports `backend/app/main.py`) |
+
+`vercel.json` holds the builds and routes. Vercel's Python runtime installs from `requirements.txt` at the root, which is exported from `backend/uv.lock`:
+
+```bash
+cd backend && uv export --no-dev --no-hashes --no-emit-project -o ../requirements.txt
+```
+
+The database is Neon Postgres (free tier, Singapore). The app and API share one origin, so the session cookie needs no cross-site settings.
 
 ## Environment
 
-On the API:
+Set in the Vercel project, production:
 
-- `DATABASE_URL=postgresql+psycopg://…`
-- `ADMIN_PASSWORD` (strong) and `SESSION_SECRET` (long random)
-- `FRONTEND_URL=https://<frontend-host>`
-- `CROSS_SITE_COOKIES=true`
-
-On the frontend: `VITE_API_URL=https://<api-host>`.
-
-Share links are built from the frontend's origin (`/f/<slug>`), so the SPA rewrite is required for them to load directly.
+- `DATABASE_URL`: Neon connection string (`postgresql+psycopg://…`, pooled)
+- `SESSION_SECRET`: long random value
+- `ADMIN_PASSWORD`: the builder password (`demo1234` on the public demo)
+- `FRONTEND_URL=https://formcraft.akshatgcodes.in`, `CROSS_SITE_COOKIES=false`
 
 ---
 
